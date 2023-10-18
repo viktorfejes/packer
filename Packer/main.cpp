@@ -8,7 +8,7 @@
 // -----------------------------------
 // STRUCTURE:
 // Header length
-// Header
+// Headers
 // - Name of file (e.g. background.jpg)
 // - Offset
 // - Length
@@ -33,9 +33,18 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-	int headerSize = 0;
+	// Precalc header size based on struct size (fixed) and amount of files to be packed
+	uint16_t headersSize = sizeof(AssetHeader) * (argc - 2);
 	std::vector<AssetHeader> headers;
-	std::vector<uint8_t> files;
+
+	// Write headers size
+	output.write(reinterpret_cast<const char*>(headersSize), sizeof(uint16_t));
+
+	// Move cursor to end of headers
+	output.seekp(headersSize, std::ios::beg);
+
+	// Set the current offset to the beginning of the files data
+	uint32_t offset = headersSize;
 
 	for (int i = 2; i < argc; ++i) {
 		std::filesystem::path filePath(argv[i]);
@@ -47,30 +56,43 @@ int main(int argc, char** argv) {
 			return 1;
 		}
 
-		// Load binary into vector of uint8_t
-		std::vector<uint8_t> inputBin(std::istreambuf_iterator<char>(input), {});
+		// Create buffer for copying file data
+		const size_t BUFFER_SIZE = 4096;
+		char buffer[BUFFER_SIZE];
+		uint32_t fileLength = 0;
+
+		while (!input.eof()) {
+			input.read(buffer, BUFFER_SIZE);
+			std::streamsize bytesRead = input.gcount();
+			output.write(buffer, bytesRead);
+			fileLength += bytesRead;
+		}
+
 		input.close();
 
 		// Create header for file
 		AssetHeader header;
-		header.name = filePath.filename().string() + "\0"; // with null terminator
-		header.offset = (headers.size() + header.name.size() + (sizeof(uint32_t) * 2)) + files.size();
-		header.length = inputBin.size();
+		strncpy(header.name, fileName.c_str(), MAX_FILENAME_LENGTH - 1);
+		header.name[MAX_FILENAME_LENGTH - 1] = '\0';
+		header.offset = offset;
+		header.length = fileLength;
 
 		// Add header to headers vector
 		headers.push_back(header);
-		// Insert into the binaries vector for files
-		files.insert(files.end(), inputBin.begin(), inputBin.end());
+
+		offset += fileLength;
 	}
 
+	// Return the cursor to the beginning of the file to overwrite the placeholder headers
+	output.seekp(0, std::ios::beg);
 	for (const auto& header : headers) {
 		// Write the headers
-		output.write(header.name.data(), header.name.size());
+		output.write(header.name, MAX_FILENAME_LENGTH);
 		output.write(reinterpret_cast<const char*>(&header.offset), sizeof(header.offset));
 		output.write(reinterpret_cast<const char*>(&header.length), sizeof(header.length));
 	}
 
-	output.write(reinterpret_cast<const char*>(files.data()), files.size());
+	output.close();
 
 	return 0;
 }
