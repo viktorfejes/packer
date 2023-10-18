@@ -50,6 +50,11 @@ int main(int argc, char** argv) {
 		std::filesystem::path filePath(argv[i]);
 		std::string fileName = filePath.filename().string();
 
+		// Check if file name is not too long
+		if (fileName.size() > MAX_FILENAME_LENGTH) {
+			std::cerr << "Filename is too long: " << fileName << std::endl;
+		}
+
 		std::ifstream input(argv[i], std::ios::binary);
 		if (!input.is_open()) {
 			std::cerr << "Couldn't open file: " << argv[i] << std::endl;
@@ -83,8 +88,8 @@ int main(int argc, char** argv) {
 		offset += fileLength;
 	}
 
-	// Return the cursor to the beginning of the file to overwrite the placeholder headers
-	output.seekp(0, std::ios::beg);
+	// Return the cursor to the beginning (plus the header length bytes (2)) of the file to overwrite the placeholder headers
+	output.seekp(sizeof(uint16_t), std::ios::beg);
 	for (const auto& header : headers) {
 		// Write the headers
 		output.write(header.name, MAX_FILENAME_LENGTH);
@@ -93,6 +98,11 @@ int main(int argc, char** argv) {
 	}
 
 	output.close();
+
+	std::cout << "Success! The following files have been successfully packed into " << argv[1] << ":" << std::endl;
+	for (int i = 2; i < argc; ++i) {
+		std::cout << " - " << argv[i] << std::endl;
+	}
 
 	return 0;
 }
