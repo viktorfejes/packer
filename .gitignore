@@ -1,0 +1,46 @@
+# Visual Studio user settings
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Dev dirs
+.vs/
+
+# Ignore Visual Studio generated files
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+# Compiled object files and libraries
+*.sdf
+*.suo
+*.opensdf
+*.sbr
+*.pdb
+*.dll
+*.exe
+*.lib
+*.exp
+
+# Debug files and directories
+Debug/
+release/
+x64/
+x86/
+Debug*/
+
+# Ignore Premake5 generated files (if you used a custom output directory)
+/bin/
+/build/
+
+# Ignore system and temporary files
+Thumbs.db
+.DS_Store
+desktop.ini
+*.tmp
+*.log
+*.swp
+*~
+*.txt
