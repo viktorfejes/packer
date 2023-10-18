@@ -15,6 +15,7 @@
 // Files Packed
 
 constexpr size_t MAX_FILENAME_LENGTH = 64;
+constexpr size_t BUFFER_SIZE = 4096;
 
 struct AssetHeader {
 	char name[MAX_FILENAME_LENGTH];
@@ -38,7 +39,7 @@ int main(int argc, char** argv) {
 	std::vector<AssetHeader> headers;
 
 	// Write headers size
-	output.write(reinterpret_cast<const char*>(headersSize), sizeof(uint16_t));
+	output.write(reinterpret_cast<const char*>(&headersSize), sizeof(uint16_t));
 
 	// Move cursor to end of headers
 	output.seekp(headersSize, std::ios::beg);
@@ -53,6 +54,7 @@ int main(int argc, char** argv) {
 		// Check if file name is not too long
 		if (fileName.size() > MAX_FILENAME_LENGTH) {
 			std::cerr << "Filename is too long: " << fileName << std::endl;
+			return 1;
 		}
 
 		std::ifstream input(argv[i], std::ios::binary);
@@ -62,7 +64,6 @@ int main(int argc, char** argv) {
 		}
 
 		// Create buffer for copying file data
-		const size_t BUFFER_SIZE = 4096;
 		char buffer[BUFFER_SIZE];
 		uint32_t fileLength = 0;
 
