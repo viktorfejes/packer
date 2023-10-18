@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
 		// Create header for file
 		AssetHeader header;
 		strncpy(header.name, fileName.c_str(), MAX_FILENAME_LENGTH - 1);
-		header.name[MAX_FILENAME_LENGTH - 1] = '\0';
+		header.name[fileName.size()] = '\0';
 		header.offset = offset;
 		header.length = fileLength;
 
@@ -118,7 +118,7 @@ int main(int argc, char** argv) {
 	std::cout << "Success! The following files have been successfully packed into " << argv[1] << ":" << std::endl;
 	for (int i = 2; i < argc; ++i) {
 		std::filesystem::path filePath(argv[i]);
-		std::cout << " - " << PrintAbsolutePath(argv[i]) << std::endl;
+		std::cout << " - " << PrintAbsolutePath(argv[i]) << "\n" << std::endl;
 	}
 
 	return 0;
