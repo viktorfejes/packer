@@ -56,8 +56,8 @@ int main(int argc, char** argv) {
 	// Write headers size
 	output.write(reinterpret_cast<const char*>(&headersSize), sizeof(uint16_t));
 
-	// Move cursor to end of headers
-	output.seekp(headersSize, std::ios::beg);
+	// Move cursor to end of headers + headerlength bytes
+	output.seekp(headersSize + sizeof(headersSize), std::ios::beg);
 
 	// Set the current offset to the beginning of the files data
 	uint32_t offset = headersSize;
@@ -117,6 +117,7 @@ int main(int argc, char** argv) {
 
 	std::cout << "Success! The following files have been successfully packed into " << argv[1] << ":" << std::endl;
 	for (int i = 2; i < argc; ++i) {
+		std::filesystem::path filePath(argv[i]);
 		std::cout << " - " << PrintAbsolutePath(argv[i]) << std::endl;
 	}
 
