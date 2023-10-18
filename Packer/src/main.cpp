@@ -17,6 +17,19 @@
 constexpr size_t MAX_FILENAME_LENGTH = 64;
 constexpr size_t BUFFER_SIZE = 4096;
 
+// Util function to check the absolute path we are trying to reach
+// Useful where relative path is confusing.
+std::string PrintAbsolutePath(const std::string& relativePath) {
+	std::filesystem::path path(relativePath);
+	if (path.is_relative()) {
+		std::filesystem::path absolutePath = std::filesystem::current_path() / path;
+		return absolutePath.string();
+	}
+	else {
+		return path.string();
+	}
+}
+
 struct AssetHeader {
 	char name[MAX_FILENAME_LENGTH];
 	uint32_t offset, length;
@@ -61,7 +74,7 @@ int main(int argc, char** argv) {
 
 		std::ifstream input(argv[i], std::ios::binary);
 		if (!input.is_open()) {
-			std::cerr << "Couldn't open file: " << argv[i] << std::endl;
+			std::cerr << "Couldn't open file: " << PrintAbsolutePath(argv[i]) << std::endl;
 			return 1;
 		}
 
@@ -104,7 +117,7 @@ int main(int argc, char** argv) {
 
 	std::cout << "Success! The following files have been successfully packed into " << argv[1] << ":" << std::endl;
 	for (int i = 2; i < argc; ++i) {
-		std::cout << " - " << argv[i] << std::endl;
+		std::cout << " - " << PrintAbsolutePath(argv[i]) << std::endl;
 	}
 
 	return 0;
