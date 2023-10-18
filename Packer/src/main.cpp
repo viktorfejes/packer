@@ -37,6 +37,8 @@ int main(int argc, char** argv) {
 	// Precalc header size based on struct size (fixed) and amount of files to be packed
 	uint16_t headersSize = sizeof(AssetHeader) * (argc - 2);
 	std::vector<AssetHeader> headers;
+	// Since we know the number of files, we can reserve memory for vector
+	headers.reserve(argc - 2);
 
 	// Write headers size
 	output.write(reinterpret_cast<const char*>(&headersSize), sizeof(uint16_t));
