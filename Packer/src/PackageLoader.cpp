@@ -16,7 +16,7 @@ PackageLoader::PackageLoader(const std::string& packageFile)
 	// Clear out to make sure.
 	m_Headers.clear();
 
-	size_t lengthCheck = 0;
+	int lengthCheck = 0;
 
 	while (pkg.tellg() < m_HeaderLength) {
 		PackageHeader header;
