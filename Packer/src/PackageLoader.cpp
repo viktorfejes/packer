@@ -62,6 +62,9 @@ void PackageLoader::loadAsset(const std::string& assetName, std::vector<uint8_t>
 	}
 
 	// See if we can find the asset in the headers
+	// (Alternatively, this could have been a vector, which could be faster
+	// for small number of header. However, I feel like it's much more elegant
+	// to use string keys)
 	auto findAsset = m_Headers.find(assetName);
 	if (findAsset == m_Headers.end()) {
 		throw std::runtime_error("Asset \"" + assetName + "\" not found in currently loaded package.");

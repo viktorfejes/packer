@@ -78,6 +78,9 @@ int main(int argc, char** argv) {
 			return 1;
 		}
 
+		// TODO: Check if file is not bigger than what we can store as its length
+		// (uint32_t currently)
+
 		// Create buffer for copying file data
 		char buffer[BUFFER_SIZE];
 		uint32_t fileLength = 0;
